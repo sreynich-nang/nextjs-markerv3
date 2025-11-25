@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { uploadFile } from "../lib/api";
 import DownloadButton from "./DownloadButton";
+import FilterTablesButton from "./FilterTablesButton";
 import { UploadResponse } from "../types";
 
 export default function UploadBox() {
@@ -10,6 +11,7 @@ export default function UploadBox() {
   const [resultPath, setResultPath] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const isPdf = file ? (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) : false;
 
   const handleUpload = async () => {
     if (!file) return alert("Please select a file");
@@ -89,7 +91,10 @@ export default function UploadBox() {
       {resultPath && (
         <div>
           <p className="text-green-600 mb-2">Processing complete! Path: {resultPath}</p>
-          <DownloadButton resultPath={resultPath} />
+          <div className="flex gap-3">
+            <DownloadButton resultPath={resultPath} />
+            {isPdf && <FilterTablesButton resultPath={resultPath} />}
+          </div>
         </div>
       )}
     </div>

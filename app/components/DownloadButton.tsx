@@ -3,16 +3,16 @@
 import { DownloadButtonProps } from "../types";
 
 export default function DownloadButton({ resultPath }: DownloadButtonProps) {
+  const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL as string) || "http://192.168.10.99:8000";
   const handleDownload = async () => {
     try {
       console.log("Download path:", resultPath);
-      
-      // Encode each part separately (folder names, not slashes)
-      const pathParts = resultPath.split('/');
+      // Normalize Windows paths and encode each segment
+      const normalized = resultPath.replace(/\\/g, '/');
+      const pathParts = normalized.split('/');
       const encodedParts = pathParts.map(part => encodeURIComponent(part));
       const encodedPath = encodedParts.join('/');
-      
-      const downloadUrl = `http://192.168.10.99:8000/api/download/${encodedPath}`;
+      const downloadUrl = `${BACKEND}/api/download/${encodedPath}`;
       console.log("Full download URL:", downloadUrl);
       
       const res = await fetch(downloadUrl);
@@ -28,7 +28,7 @@ export default function DownloadButton({ resultPath }: DownloadButtonProps) {
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = resultPath.split("/").pop() || "output.md";
+      a.download = normalized.split("/").pop() || "output.md";
       a.click();
 
       URL.revokeObjectURL(url);
